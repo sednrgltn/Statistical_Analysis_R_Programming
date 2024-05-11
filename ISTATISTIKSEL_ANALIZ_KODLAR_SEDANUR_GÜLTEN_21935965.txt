@@ -1,0 +1,250 @@
+
+İSTATİSTİKSEL ANALİZ FİNAL ÖDEVİ KODLAR-SEDANUR GÜLTEN
+install.packages("readxl")
+library(readxl)
+music_m <- read_excel("music_m.xlsx")
+View(music_m)
+
+library(readxl)
+music_m <- read_excel("C:/Users/sedad/Desktop/music_m.xlsx")
+View(music_m)
+install.packages("dplyr")
+library(dplyr)
+glimpse(music_m)
+names(music_m)
+colSums(is.na(music_m))
+filter(music_m, !is.na(Age),!is.na(Primarystreamingservice), !is.na(Whileworking), !is.na(Instrumentalist), !is.na(BPM))
+music_mh <- na.omit(music_m)
+music_veri<-data.frame(music_mh)
+music_veri
+dim(music_veri)
+str(music_veri)
+summary(music_veri)
+music_veri2 <- subset(music_veri, Age <= 60 )
+music_veri2
+music_veri3<- subset(music_veri2, Hoursperday <= 15)
+music_veri3
+music_veri4 <- subset(music_veri3, BPM <= 250 )
+music_veri4
+music_yeni_veri= subset(music_veri4, select = -c(Timestamp,Permissions) )
+music_yeni_veri
+data.frame(music_yeni_veri)
+music_yeni_veri %>%
+  write.csv("music_yeni_veri")
+music_yeni_veri
+
+grupped_music <- group_by(music_yeni_veri, Primarystreamingservice)
+summarise(grupped_music, mean(BPM))
+
+grupped_music2 <- group_by(music_yeni_veri, Primarystreamingservice)
+sumg_mus2<-summarise(grupped_music2, mean(Age))
+data.frame(sumg_mus2)
+View(sumg_mus2)
+
+kullanici_platform<- music_yeni_veri%>%
+  filter(Primarystreamingservice != "") %>%
+  group_by(Primarystreamingservice)%>%
+  summarize(kullanıcı = n())%>%
+  arrange(desc(kullanıcı))
+View(kullanici_platform)
+
+yeni_music_verisi2 <- music_yeni_veri %>% 
+  select(Primarystreamingservice, BPM, Age) %>% 
+  filter(Primarystreamingservice %in% c("Spotify", "YouTube Music")) %>% 
+  arrange(Primarystreamingservice)
+View(yeni_music_verisi2)
+
+yeni_music_verisi3 <- music_yeni_veri %>% 
+  select(Primarystreamingservice, Frequency.Classical. , Age) %>% 
+  filter(Primarystreamingservice %in% c("Spotify", "YouTube Music")) %>% 
+  arrange(Primarystreamingservice,Frequency.Classical.)
+data.frame(yeni_music_verisi3)
+View(yeni_music_verisi3)
+
+jazz_music<- music_yeni_veri$Frequency.Jazz.
+Jazz_table<-table(jazz_music)
+View(Jazz_table)
+
+jazz_music_bin<- jazz_music[jazz_music == 'Never']
+jazz_music_bin<- append(jazz_music_bin , jazz_music[jazz_music == 'Very frequently'])
+table(jazz_music_bin)
+View(table(jazz_music_bin))
+
+binom.test(x=44 , n=248 , p=0.5)
+
+install.packages("devtools")
+library(devtools)
+library(usethis)
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("DataExplorer")
+library(DataExplorer)
+help(package = "DataExplorer")
+create_report(music_yeni_veri)
+plot_str(music_yeni_veri)
+introduce(music_yeni_veri)
+view(introduce(music_yeni_veri))
+plot_intro(music_yeni_veri)
+plot_missing(music_yeni_veri)
+plot_bar(music_yeni_veri)
+plot_bar(music_yeni_veri, by = "Foreignlanguages")
+plot_bar(music_yeni_veri, by = "Musiceffects")
+plot_histogram(music_yeni_veri)
+plot_density(music_yeni_veri)
+plot_qq(music_yeni_veri)
+plot_qq(music_yeni_veri, by = "Musiceffects")
+plot_qq(music_yeni_veri, by = "Primarystreamingservice")
+plot_boxplot(music_yeni_veri, by = "Musiceffects")
+plot_correlation(music_yeni_veri)
+plot_scatterplot(split_columns(music_yeni_veri)$continuous, by = "BPM", sampled_rows = 1000L)
+plot_prcomp(music_yeni_veri, maxcat = 5L)
+
+install.packages("esquisse")
+library(esquisse)
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+install.packages("esquisse")
+library(esquisse)
+esquisser(music_yeni_veri)
+
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ ggplot() +
+ aes(x = Depression, y = Age) +
+ geom_point(shape = "circle plus", size = 1.5, 
+ colour = "#FF8C00") +
+ labs(x = "Depresyon Puanı", y = "Yaşlar", title = "Yaş ve Depresyon (0-10) Puanları Nokta Grafiği ") +
+ theme_light() +
+ theme(plot.caption = element_text(size = 25L, face = "italic", hjust = 0.5))
+
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+  filter(!(Favgenre %in% "R&B")) %>%
+  ggplot() +
+  aes(x = Primarystreamingservice, y = Hoursperday) +
+  geom_col(fill = "#440154") +
+  labs(x = "Müzik Servisleri", y = "Günlük Dinleme Süreleri ", title = "Müzik süresi ve Müzik Servisleri Grafiği") +
+  theme_gray() +
+  theme(plot.caption = element_text(size = 25L, face = "bold", hjust = 0.5))
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ ggplot() +
+ aes(x = BPM, y = Frequency.Jazz.) +
+ geom_boxplot(fill = "#B6457D") +
+ labs(x = "BPM(Vuruş Sayısı)", 
+ y = "Caz Müzik Dinleme Sıklığı ", subtitle = "Caz Müzik Dinleme Sıklıkları İle Dinlenilen Vuruş Sayısı") +
+ theme_linedraw() +
+ theme(plot.caption = element_text(size = 25L, hjust = 0.5))
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ ggplot() +
+ aes(x = Depression, y = Hoursperday, colour = Frequency.Pop.) +
+ geom_point(shape = "diamond plus", 
+ size = 1.5) +
+ scale_color_manual(values = c(Never = "#F8766D", Rarely = "#31B425", Sometimes = "#20AFEC", 
+`Very frequently` = "#FF61C3")) +
+ labs(x = "Depresyon puanları", y = "Günlük Dinleme Süreleri", subtitle = "Pop Müziği Dinleme Sıklıklarına Göre Günlük Dinleme Süreleri ve Depresyon Puanları") +
+ theme_gray()
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ filter(Depression >= 9L & Depression <= 10L) %>%
+ ggplot() +
+ aes(x = Depression, fill = Musiceffects) +
+ geom_histogram(bins = 30L) +
+ scale_fill_manual(values = c(Improve = "#D41A0D", 
+`No effect` = "#28E2C2", Worsen = "#0E11AF")) +
+ labs(x = "Depresyon Puanı(0-10)", subtitle = "Müzik Dinlemenin Ruh Sağlığını Etkileme Durumu ile Depresyon Puanı Dokuz ve Üstü Olan Kişilere İlişkin Grafik", 
+ fill = "Müziğin Ruh Sağlığını Etkileme Durumları") +
+ theme_gray()
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Primarystreamingservice %in% "I do not use a streaming service.")) %>%
+ filter(Favgenre %in% 
+ c("Jazz", "Rock", "Pop", "Classical")) %>%
+ ggplot() +
+ aes(x = Primarystreamingservice) +
+ geom_bar(fill = "#B22222") +
+ labs(x = "Müzik Platformları", 
+ y = "Dinleme") +
+ theme_bw()
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ ggplot() +
+ aes(x = Age, y = Hoursperday, fill = Whileworking) +
+ geom_point(shape = "circle filled", 
+ size = 1.5, colour = "#112446") +
+ scale_fill_manual(values = c(No = "#4A074A", Yes = "#D8C81C")) +
+ labs(x = "Yaşlar", y = "Günlük Dinleme Süreleri ", title = "Yaşlar ve Çalışma Durumuna Göre Günlük Müzik Dinleme Süreleri") +
+ theme_minimal() +
+ theme(plot.caption = element_text(size = 25L, face = "italic", hjust = 0.5))
+
+esquisser(music_yeni_veri)
+
+library(dplyr)
+library(ggplot2)
+
+music_yeni_veri %>%
+ filter(!(Favgenre %in% "R&B")) %>%
+ filter(!(Musiceffects %in% "No effect")) %>%
+ ggplot() +
+ aes(x = Anxiety, y = Musiceffects, fill = Exploratory) +
+ geom_boxplot() +
+ scale_fill_manual(values = c(No = "#168173", 
+Yes = "#AA1717")) +
+ labs(x = "Katılımcıların Kendilerine Verdikleri Depresyon Puanı", y = "Müzik Ruh Sağlığını Nasıl Etkiliyor?", 
+ subtitle = "Depresyon Puanlarının, Katılımcıların Yeni Müzik Türü/ Sanatçı Keşfine Göre, Ruh Sağlığını Ne Durumda Etkiliyor?", 
+ fill = "Katılımcı Yeni Sanatçı/Tür Keşfediyor mu?") +
+ theme_gray() +
+ theme(legend.position = "top", 
+ plot.caption = element_text(size = 25L, face = "italic", hjust = 0.5))
+
+
+
+
+
+
+
+
+
+
